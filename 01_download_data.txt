@@ -1,0 +1,27 @@
+#!/bin/bash
+# Author: Olanrewaju Akinyemi
+# Purpose:       
+   Download raw sequencing data and organize it into proper directories.
+
+#   1. Create project directory and change to the directory in one line of command
+mkdir -p project $$ cd project/
+#   2. Download data download script from GitHub.
+echo "[INFO] Downloading raw data script..."
+wget https://raw.githubusercontent.com/HackBio-Internship/2025_project_collection/refs/heads/main/SA_Polony_100_download.sh
+
+#   3. Downsize to first 50 samples (header + 100 lines → 50 samples, paired-end)
+head -n 101 SA_Polony_100_download.sh > SA_Polony_50_download.sh
+
+#   4. Run downsized script
+bash SA_Polony_50_download.sh
+
+#   5. Move FASTQ files to raw_reads folder
+mkdir -p raw_reads
+mv *fastq.gz raw_reads/
+
+#   6. Archive original scripts for reproducibility
+mkdir -p archive
+mv *.sh archive/
+
+echo "[INFO] Raw data downloaded and organized."
+
