@@ -1,5 +1,4 @@
 #!/bin/bash
-# Author: Olanrewaju Akinyemi
 # Purpose:       
    Download raw sequencing data and organize it into proper directories.
 
@@ -24,5 +23,6 @@ mkdir -p archive
 mv *.sh archive/
 
 echo "[INFO] Raw data downloaded and organized."
+
 
 
