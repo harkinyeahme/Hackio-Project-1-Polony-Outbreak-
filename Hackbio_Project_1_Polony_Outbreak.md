@@ -43,12 +43,68 @@ Epidemiological tracing pointed to **cold-processed meat (“polony”) from Ent
 
 ### Workflow  
 1. **Data download & setup**  
-   - Script: `01_download_data.sh`  
-   - Created project directories, downsized dataset (n=50), archived scripts.  
+   - Script: `01_download_data.sh` 
+   - Created project directories, downsized dataset (n=50), archived scripts.
+```bash
+#!/bin/bash
+# Author: Olanrewaju Akinyemi
+# Purpose:       
+   Download raw sequencing data and organize it into proper directories.
+
+#   1. Create project directory and change to the directory in one line of command
+mkdir -p project $$ cd project/
+#   2. Download data download script from GitHub.
+echo "[INFO] Downloading raw data script..."
+wget https://raw.githubusercontent.com/HackBio-Internship/2025_project_collection/refs/heads/main/SA_Polony_100_download.sh
+
+#   3. Downsize to first 50 samples (header + 100 lines → 50 samples, paired-end)
+head -n 101 SA_Polony_100_download.sh > SA_Polony_50_download.sh
+
+#   4. Run downsized script
+bash SA_Polony_50_download.sh
+
+#   5. Move FASTQ files to raw_reads folder
+mkdir -p raw_reads
+mv *fastq.gz raw_reads/
+
+#   6. Archive original scripts for reproducibility
+mkdir -p archive
+mv *.sh archive/
+
+echo "[INFO] Raw data downloaded and organized."
+```
 
 2. **Quality control**  
    - Script: `02_fastqc_multiqc.sh`  
-   - QC on raw reads.  
+   - QC on raw reads.
+
+```bash
+#!/bin/bash
+# Purpose: 
+#   Perform quality control (FastQC) on raw reads and aggregate results with MultiQC.
+# Input: raw_reads/*.fastq.gz
+# Output: fastqc_reports/ + multiqc_reports_raw/
+
+
+mkdir -p fastqc_reports
+
+echo "[INFO] Running FastQC on raw reads..."
+for R1 in raw_reads/*_1.fastq.gz; do
+    [[ -f "$R1" ]] || continue  # Skip if no file
+    SAMPLE=$(basename "$R1" _1.fastq.gz)
+    R2="raw_reads/${SAMPLE}_2.fastq.gz"
+
+    fastqc "$R1" "$R2" -o fastqc_reports
+    echo "[INFO] FastQC completed for sample: $SAMPLE"
+done
+
+# Aggregate all FastQC reports into a summary
+mkdir -p multiqc_reports
+multiqc fastqc_reports/ -o multiqc_reports_raw/
+
+echo "[INFO] FastQC + MultiQC completed."
+
+```
 
 3. **Trimming**  
    - Script: `03_fastp_trim.sh`  
