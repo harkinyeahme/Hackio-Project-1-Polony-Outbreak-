@@ -22,3 +22,4 @@ mkdir -p multiqc_reports
 multiqc fastqc_reports/ -o multiqc_reports_raw/
 
 echo "[INFO] FastQC + MultiQC completed."
+
